@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  <display-name>web06</display-name>
+
+    <!-- 톰캣 context.xml 과의 연동 -->
+  <resource-ref>
+  	<res-ref-name>jdbc/jointest</res-ref-name> <!-- 톰캣 서버에서 선언한 자원의 이름이다 -->
+  	<res-type>javax.sql.DataSource</res-type> <!-- 톰캣 서버에서 리턴하는 자원의 타입 -->
+  	<res-auth>Container</res-auth> <!-- 자원의 관리 주체를 설정하는 태그문, Container는 서버에서 관리한다는 의미이다.-->
+  </resource-ref>
+  <!-- /톰캣 context.xml 과의 연동 -->
+
+  <!-- 필터 -->
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>spms.filters.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <!-- /필터 -->
+
+  <!-- 리스너 -->
+  <listener>
+  	<listener-class>spms.listeners.ContextLoaderListener</listener-class>
+  </listener>
+  <!-- /리스너 -->
+
+  <!-- Context -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/application-context.properties</param-value>
+  </context-param>
+  <!-- /Context -->
+
+  <!-- 서블릿 -->
+  <servlet>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <servlet-class>spms.servlets.DispatcherServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DispatcherServlet</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <!-- /서블릿 -->
+
+  <!-- Welcome -->
+  <welcome-file-list>
+    <welcome-file>index.html </welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  <!-- /Welcome -->
+</web-app>
