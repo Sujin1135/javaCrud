@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/">
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
-    <Resource name="jdbc/jointest" auth="Container" type="javax.sql.DataSource"
+    <Resource name=your localhost auth="Container" type="javax.sql.DataSource"
     maxActive="10" maxIdle="3" maxWait="10000"
-    username="root"
-    password="tnwls1135"
+    username=xxxxx
+    password=xxxxx
     driverClassName="com.mysql.jdbc.Driver"
     url="jdbc:mysql://localhost/jointest"
     closeMethod="close"></Resource>
