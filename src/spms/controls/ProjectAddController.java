@@ -13,7 +13,7 @@ public class ProjectAddController implements DataBinding, Controller {
 
     public Object[] getDataBinding() {
         return new Object[] {
-          "project", spms.vo.Project.class
+          "project", Project.class
         };
     }
 
@@ -30,8 +30,8 @@ public class ProjectAddController implements DataBinding, Controller {
         } else {
             System.out.println(project.getStartDate());
             System.out.println(projectDao);
-            projectDao.addProject(project);
-            return "redirect:add.do";
+            projectDao.insert(project);
+            return "redirect:list.do";
         }
     }
 }

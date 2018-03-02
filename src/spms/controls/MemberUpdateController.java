@@ -13,7 +13,7 @@ public class MemberUpdateController implements Controller, DataBinding {
 
     public Object[] getDataBinding() {
         return new Object[] {"no", Integer.class,
-                "member", spms.vo.Member.class};
+                "member", Member.class};
     }
 
     public MemberUpdateController setMemberDao(MemberDao memberDao) {

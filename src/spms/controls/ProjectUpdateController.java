@@ -14,7 +14,7 @@ public class ProjectUpdateController implements Controller, DataBinding {
     public Object[] getDataBinding () {
         return new Object[] {
                 "no", Integer.class,
-                "project", spms.vo.Project.class
+                "project", Project.class
         };
     }
 
@@ -28,10 +28,11 @@ public class ProjectUpdateController implements Controller, DataBinding {
 
         try {
             if(project.getName() == null) {
-                model.put("project", projectDao.updateList((int)model.get("no")));
+                model.put("project", projectDao.selectOne((int)model.get("no")));
                 return "/project/ProjectUpdate.jsp";
             } else {
-                projectDao.updateProject(project);
+                System.out.println("update project.content:" + project.getContent());
+                projectDao.update(project);
                 return "redirect:list.do";
             }
         } catch (Exception e) {

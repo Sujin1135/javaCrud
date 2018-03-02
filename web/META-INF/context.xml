@@ -4,7 +4,7 @@
     <Resource name="jdbc/jointest" auth="Container" type="javax.sql.DataSource"
     maxActive="10" maxIdle="3" maxWait="10000"
     username="root"
-    password="your password"
+    password="tnwls1135"
     driverClassName="com.mysql.jdbc.Driver"
     url="jdbc:mysql://localhost/jointest"
     closeMethod="close"></Resource>

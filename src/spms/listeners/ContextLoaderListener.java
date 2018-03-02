@@ -4,6 +4,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import java.io.InputStream;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
 import spms.context.ApplicationContext;
 
 public class ContextLoaderListener implements ServletContextListener {
@@ -26,9 +32,20 @@ public class ContextLoaderListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent event) {
 		// TODO Auto-generated method stub
 		try {
-			ServletContext sc = event.getServletContext(); // 서블릿 컨택스트 생성
-			String propertiesPath = sc.getRealPath(sc.getInitParameter("contextConfigLocation")); // /WEB-INF/web.xml
-			applicationContext = new ApplicationContext(propertiesPath);
+			applicationContext = new ApplicationContext();
+
+			String resource = "spms/dao/mybatis-config.xml";
+			InputStream inputStream = Resources.getResourceAsStream(resource);
+			SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+			applicationContext.addBean("sqlSessionFactory", sqlSessionFactory);
+
+			ServletContext sc = event.getServletContext();
+			String propertiesPath = sc.getRealPath(sc.getInitParameter("contextConfigLocation"));
+
+			applicationContext.prepareObjectsByProperties(propertiesPath);
+			applicationContext.prepareObjectsByAnnotation("");
+			applicationContext.injectDependency();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

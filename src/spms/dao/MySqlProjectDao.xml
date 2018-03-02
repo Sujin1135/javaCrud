@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!-- XML 선언문 -->
+
+<!-- DTD 선언문  -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper 루트 엘리먼트
+    namespace는 자바 패키지처럼 SQL문을 묶는 용도로 사용한다.-->
+<mapper namespace="spms.dao.ProjectDao">
+    <!-- resultMap을 이용하여 칼럼과 이름을 매핑시킨다. -->
+    <resultMap type="project" id="projectResultMap">
+        <!-- column : SQL 칼럼명, property : 객체의 프로퍼티명(셋터에서 'set'만 뺀 이름)
+             id 태그는 객체 식별자로써 result 태그와 작성법이 같다.-->
+        <id column="PNO" property="no"/>
+        <result column="PNAME" property="name"/>
+        <result column="CONTENT" property="content"/>
+        <!-- result 속성 중 javaType을 사용하면 칼럼의 값을 특정 자바 객체로 변환시킨다. -->
+        <result column="STA_DATE" property="startDate" javaType="java.sql.Date"/>
+        <result column="END_DATE" property="endDate" javaType="java.sql.Date"/>
+        <result column="STATE" property="state"/>
+        <result column="CRE_DATE" property="createDate" javaType="java.sql.Date"/>
+        <result column="TAGS" property="tags"/>
+    </resultMap>
+
+    <!-- SQL 태그들
+        각각의 태그들을 구분하기 위하여 id 프로퍼티를 사용한다.-->
+    <select id="selectList" parameterType="map" resultMap="projectResultMap">
+        select PNO, PNAME, STA_DATE, END_DATE, STATE
+        from PROJECTS
+        order by
+        <choose>
+            <!-- orderCond는 parameterType의 map 타입의 객체 안에 있는 key이다. -->
+            <when test="orderCond == 'TITLE_ASC'">PNAME asc</when>
+            <when test="orderCond == 'TITLE_DESC'">PNAME desc</when>
+            <when test="orderCond == 'STARTDATE_ASC'">STA_DATE asc</when>
+            <when test="orderCond == 'STARTDATE_DESC'">STA_DATE desc</when>
+            <when test="orderCond == 'ENDDATE_ASC'">END_DATE asc</when>
+            <when test="orderCond == 'ENDDATE_DESC'">END_DATE desc</when>
+            <when test="orderCond == 'STATE_ASC'">STATE asc</when>
+            <when test="orderCond == 'STATE_DESC'">STATE desc</when>
+            <when test="orderCond == 'PNO_ASC'">PNO asc</when>
+            <otherwise>PNO desc</otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert" parameterType="project">
+        insert into PROJECTS(PNAME, CONTENT, STA_DATE, END_DATE, STATE, CRE_DATE, TAGS)
+        values (#{name}, #{content}, #{startDate}, #{endDate}, 0, now(), #{tags})
+    </insert>
+
+    <select id="selectOne" parameterType="int" resultMap="projectResultMap">
+        select PNO, PNAME, CONTENT, STA_DATE, END_DATE, STATE, CRE_DATE, TAGS
+        from PROJECTS
+        where PNO=#{value}
+    </select>
+
+    <update id="update" parameterType="map">
+      update PROJECTS
+      <set>
+          <if test="name != null"> PNAME=#{name},</if>
+          <if test="content != null"> CONTENT=#{content},</if>
+          <if test="startDate != null"> STA_DATE=#{startDate},</if>
+          <if test="endDate != null"> END_DATE=#{endDate},</if>
+          <if test="state != null"> STATE=#{state},</if>
+          <if test="tags != null"> TAGS=#{tags}</if>
+      </set>
+      where PNO=#{no}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        delete from PROJECTS
+        where PNO=#{value}
+    </delete>
+</mapper>

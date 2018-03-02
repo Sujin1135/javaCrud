@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?> <!-- XML 선언문 -->
+<!-- MyBatis 동작환경 설정파일 -->
+
+<!-- DTD 선언 -->
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- MyBatis 설정 파일 루트 엘리먼트 -->
+<configuration>
+    <!-- 프로퍼티 파일이 있는 경로 설정
+        resource : 프로퍼티 파일이 클래스 패스 경로에 있을경우
+        url : 프로퍼티 파일이 외부에 있을 경우-->
+
+    <!-- 프레임워크의 실행환경 설정 -->
+    <settings>
+        <setting name="logImpl" value="LOG4J" />
+    </settings>
+
+    <!-- 자바 클래스에 대한 별명 설정 -->
+    <typeAliases>
+        <typeAlias type="spms.vo.Project" alias="project"/>
+        <typeAlias type="spms.vo.Member" alias="member"/>
+    </typeAliases>
+
+    <!-- 프레임워크에서 사용할 데이터베이스 정보(트랜잭션 관리자, 데이터 소스) 설정 -->
+    <environments default="development"> <!-- default 속성은 environment 중 하나를 선택한 값이다 -->
+        <!-- 트랜잭션 관리 및 데이터 소스 설정 -->
+        <environment id="development">
+            <!-- 트랜잭션 관리 유형 설정(JDBC or MANAGED) -->
+            <transactionManager type="JDBC"/>
+            <!-- DataSource를 설정한다(UNPOOLED, POOLED, JNDI) -->
+            <dataSource type="JNDI">
+                <!-- 기본 정보들을 입력하는 프로퍼티
+                    value 속성의 ${} 안의 값들은 properties 태그의 패스파일의 프로퍼티들이다.-->
+                <property name="data_source" value="java:comp/env/jdbc/jointest"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- SQL 맵퍼 파일들의 경로 설정 -->
+    <mappers>
+        <mapper resource="spms/dao/MySqlProjectDao.xml"/>
+        <mapper resource="spms/dao/MySqlMemberDao.xml"/>
+    </mappers>
+</configuration>

@@ -23,7 +23,7 @@ public class ProjectDeleteController implements Controller, DataBinding {
 
     public String execute (Map<String, Object> model) throws Exception {
         System.out.println(projectDao);
-        projectDao.deleteProject((int)model.get("no"));
+        projectDao.delete((int)model.get("no"));
         return "redirect:list.do";
     }
 }

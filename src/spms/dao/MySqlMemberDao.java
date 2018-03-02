@@ -1,13 +1,13 @@
 package spms.dao;
 
-import java.sql.*;
 import java.util.List;
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import spms.vo.Member;
 import spms.annotation.Component;
+
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSession;
 
 @Component("memberDao")
 public class MySqlMemberDao implements MemberDao {
@@ -16,153 +16,95 @@ public class MySqlMemberDao implements MemberDao {
 	 * Connection의 인스턴스 변수를 생성한 후 셋터 메서드를 사용하여 서블릿에서 connection을 주입받아야 한다.
 	 * 이를 의존성 주입(DI, Dependency Injection) 이라고 한다.
 	 */
-	DataSource ds;
-	
-	public void setDataSource(DataSource ds) {
-		this.ds = ds;
+	SqlSessionFactory sqlSessionFactory;
+
+	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		this.sqlSessionFactory = sqlSessionFactory;
 	}
 	
-	public List<Member> selectList() throws Exception {
-		Connection connection = ds.getConnection();
-		
-		Statement stmt = null;
-		ResultSet rs = null;
-		
+	public List<Member> selectList(HashMap<String, Object> paramMap) throws Exception {
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 		try {
-			stmt = connection.createStatement();
-			rs = stmt.executeQuery(
-				"SELECT MNO, MNAME, EMAIL, CRE_DATE" +
-				" FROM MEMBERS" +
-				" ORDER BY MNO ASC"
-			);
-			
-			ArrayList<Member> members = new ArrayList<Member>();
-		
-			while (rs.next()) {
-				members.add(new Member()
-					.setNo(rs.getInt("MNO"))
-					.setName(rs.getString("MNAME"))
-					.setEmail(rs.getString("EMAIL"))
-					.setCreateDate(rs.getDate("CRE_DATE"))
-				);
-			}
-			
-			return members;
+			return sqlSession.selectList("spms.dao.MemberDao.selectList", paramMap);
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if(rs != null) rs.close();; } catch (Exception e) {}
-			try { if(stmt != null) stmt.close(); } catch (Exception e) {}
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 	
 	public void addMember (Member member) throws Exception {
-		PreparedStatement stmt = null;
-		Connection connection = ds.getConnection();
-		try {
-			stmt = connection.prepareStatement(
-			"INSERT INTO MEMBERS(MNAME, PWD, EMAIL, CRE_DATE, MOD_DATE) VALUES "+
-			"(?, ?, ?, NOW(), NOW())"
-			);
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 
-			stmt.setString(1, member.getName());
-			stmt.setString(2, member.getPassword());
-			stmt.setString(3, member.getEmail());
-			stmt.executeUpdate();
+		try {
+			sqlSession.insert("spms.dao.MemberDao.insert", member);
+			sqlSession.commit();
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 	
 	public void deleteMember(int no)
 			throws Exception {
-		PreparedStatement stmt = null;
-		Connection connection = ds.getConnection();
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			stmt = connection.prepareStatement("DELETE FROM MEMBERS WHERE MNO = ?");
-			stmt.setInt(1, no);
-			stmt.executeUpdate();
+			sqlSession.delete("spms.dao.MemberDao.delete", no);
+			sqlSession.commit();
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if(stmt != null) stmt.close(); } catch (Exception e) {}
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 	
 	public void updateMember(Member member)
 			throws Exception {
-		PreparedStatement stmt = null;
-		Connection connection = ds.getConnection();
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			stmt = connection.prepareStatement("UPDATE MEMBERS SET MNAME=?, EMAIL=?, MOD_DATE = now()"
-					+ " WHERE MNO=?");
-			stmt.setString(1, member.getName());
-			stmt.setString(2, member.getEmail());
-			stmt.setInt(3, member.getNo());
-			stmt.executeUpdate();
+			sqlSession.update("spms.dao.MemberDao.update", member);
+			sqlSession.commit();
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if(stmt != null) stmt.close(); } catch (Exception e) {}
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 	
 	public Member updateList(int no)
 			throws Exception {
-		Connection connection = ds.getConnection();
-		Statement stmt = null;
-		ResultSet rs = null;
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			System.out.println("update: " + no);
-			stmt = connection.createStatement();
-			rs = stmt.executeQuery("SELECT MNO, MNAME, EMAIL, CRE_DATE FROM MEMBERS WHERE MNO=" 
-					+ no);
-			rs.next();
-			
-			return new Member().setNo(rs.getInt("MNO"))
-					.setName(rs.getString("MNAME")).setEmail(rs.getString("EMAIL"))
-					.setCreateDate(rs.getDate("CRE_DATE"));
+			return sqlSession.selectOne("spms.dao.MemberDao.selectOne", no);
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if(rs != null) rs.close();; } catch (Exception e) {}
-			try { if(stmt != null) stmt.close(); } catch (Exception e) {}
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 	
 	public Member memberLogin(Member member)
 			throws Exception {
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		Connection connection = ds.getConnection();
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			stmt = connection.prepareStatement("SELECT MNAME, EMAIL FROM MEMBERS "
-					+ "WHERE EMAIL=? AND PWD=?");
-			stmt.setString(1, member.getEmail());
-			stmt.setString(2, member.getPassword());
-			rs = stmt.executeQuery();
+			HashMap<String, Object> paramMap = new HashMap<String, Object>();
+			Member loginMember = sqlSession.selectOne("spms.dao.MemberDao.login",
+					member);
 			
-			if(rs.next()) {
-				member = new Member().setEmail(rs.getString("EMAIL"))
-						.setName(rs.getString("MNAME")).setPassword(null);
-				return member;
+			if(loginMember.getEmail() != null) {
+				return loginMember;
 			} else {
 				return new Member();
 			}
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try { if(rs != null) rs.close(); } catch (Exception e) {}
-			try { if(stmt != null) stmt.close(); } catch (Exception e) {}
-			// DBCP의 BasicDataSource는 커넥션의 대행 객체인 PoolableConnection 을 반환한다.
-			try { if (connection != null) connection.close(); } catch (Exception e) {}
+			sqlSession.close();
 		}
 	}
 }

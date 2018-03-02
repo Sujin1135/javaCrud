@@ -24,7 +24,7 @@ public class LoginController implements Controller, DataBinding {
 	}
 
 	public Object[] getDataBinding() {
-		return new Object[]{"loginInfo", spms.vo.Member.class};
+		return new Object[]{"loginInfo", Member.class};
 	}
 
 	public String execute (Map<String, Object> model) throws Exception {
